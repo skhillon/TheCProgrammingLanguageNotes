@@ -47,6 +47,7 @@ You don't need the expressions in a for loop.
 while (1) {}
 
 for (;;) {}
+```
 
 # Skipped sections 3.5-3.7...
 
