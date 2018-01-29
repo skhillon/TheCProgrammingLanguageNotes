@@ -85,3 +85,61 @@ because their functionality is one and the same.
 On the other hand, pointers can always be changed to point elsewhere, but you can't modify the string contents directly.
 
 # 5.6: Pointer Arrays; Pointers to Pointers
+Yeah you can have them.
+
+# 5.7: Multi-dimensional Arrays
+You can have these too:
+```c
+static char daytab[2][4] = {
+    { 0, 1, 2, 3 },
+    { 4, 5, 6, 7 }
+}
+```
+
+If a two-dimensional array is to be passed to a function, the parameter declaration must specify the number of columns (4 above). We don't care about number of rows because we can just keep iterating rows until we hit a NULL pointer. We do, however, need a way to get back up to the row-level.
+
+```c
+foo(int daytab[2][4]) {
+
+}
+
+or
+
+foo(int daytab[][13]) {
+
+}
+
+or 
+
+foo (int (*daytab)[13]) {
+
+}
+```
+
+# 5.8: Initialization of Pointer Arrays
+It's the same as with the other declaration:
+
+```c
+static char *name[] = {
+    "Illegal Month", "January", ... "December"
+}; /* DON'T FORGET THE SEMICOLON */
+```
+
+# 5.9: Pointers vs Multi-dimensional Arrays
+If you do this:
+```c
+int a[10][20];
+```
+then you set aside 200 integer-sized locations in memory, and you use a[row][col] to get to an index.
+
+However, if you do this:
+```c
+int *b[10];
+```
+then the definition only allocates 10 pointers and does not initialzie them. Even if we end up needing all 200, we didn't need it right away, and that makes things more dynamic.
+
+# 5.10: Command Line Arguments: Done that
+# 5.11: Pointers to Functions
+In C, a function itself is not a variable. However, functions can be assigned, placed in arrays, passed to other functions, returned by functions, etc.
+
+# 5.12: I dont think we need to know this cuz it's whack
