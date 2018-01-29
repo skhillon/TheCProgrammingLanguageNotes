@@ -63,4 +63,25 @@ Both will pass elements 2 -> last.
 *If you are sure that elements exist*, you can also index backwards in an array. For example, if you were handed an array starting at element 2, as in the last code snippet, your local array copy would start at index 0. However, you know for a fact that there are two more that a function did not pass. You may access arr[-1] or arr[-2], which immediately precede index 0.
 
 # 5.4: Address Arithmetic
+Beyond the stuff you saw in the last section, you can actually use relational operators on pointers. If pointers p and q point to members of the same array, then you can use `<, >, !-, ==` based on position in the array.
 
+`size_t` is the unsigned integer type returned by the `sizeof` operator.
+
+# 5.5: Character Pointers and Functions
+A string constant "I am a string" is an array of characters with '\0' appended at the end. The length in storage is therefore 1 more than the number of characters.
+
+There is an important distinction between the following two lines of code:
+```c
+char arrmessage[] = "now is the time";
+char *pmessage = "now is the time";
+```
+
+`arrmessage` is an array which is big enough to hold all the characters and a terminating null character. You may change elements in this array, but for all intents and purposes, you should treat this line as if it were
+```c
+const char arrmessage[] = "now is the time";
+```
+because their functionality is one and the same.
+
+On the other hand, pointers can always be changed to point elsewhere, but you can't modify the string contents directly.
+
+# 5.6: Pointer Arrays; Pointers to Pointers
