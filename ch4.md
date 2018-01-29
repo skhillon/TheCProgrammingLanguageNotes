@@ -66,4 +66,27 @@ The centralized file is called a **header file**, which we may call `calc.h`. No
 For bigger projects, you might want to have multiple header files (perhaps one for unit tests?), but for now, one is enough.
 
 # 4.6: Static Variables
+If you import another file, you have access to all of its functions and external variables. However, if you want to keep things only accessible within the sourcefile (like `private` in Java or `fileprivate` in Swift), you can prepend with `static`.
+
+So, now if you're using global (external) variables within the source file, and you want the functions to be usable outside, but you don't want the variables to be seen, do this:
+
+```c
+static char buf[BUFF_SIZE]; /* Visible within source file, not outside. */
+static int bufp = 0; /* Still only visible within source file */
+
+int foo(void) {} /* External, visible to any other file */
+
+void bar(void) {} /* Uses static vars, but again, the function is visible outside. */
+```
+
+If you've seen any Java programming, this might be the equialent:
+
+```Java
+private String buf;
+private int bufp = 0;
+
+public int foo() {}
+
+public void bar() {}
+```
 
