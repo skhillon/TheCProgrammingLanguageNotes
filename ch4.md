@@ -90,3 +90,153 @@ public int foo() {}
 public void bar() {}
 ```
 
+# 4.7: Register Variables
+Hopefully you've taken some sort of computer architecture class. If not, the Processing Unit keeps a few **registers** nearby so it doesn't have to go aaaallll the way to memory (RAM). This is all at the nano-level, but distance still matters, and accessing registers is hundreds or thousands of times faster than accessing memory.
+
+Declaring a variable with `register` *suggests* that the variable should be placed in a register because it will be heavily used. The compiler is free to ignore you if it thinks that's stupid.
+
+You can only apply this declaration to *automatic variables and to formal parameters of a function*. In other words, no register globals. Ex:
+
+```c
+void foo(register unsigned int a, register unsigned int b) {
+    register int i;
+    ...
+}
+```
+
+While this is fast, it comes with restrictions. For example, you can't get the address of a register variable because it might not even be in memory. This is rarely used.
+
+# 4.8: Block Structure
+Variables exist within the scope of their nearest block. So, if you declare a variable in an if-statement, the variable will only be accessible during the execution of that if statemnet.
+
+Automatic variables are initialized and uninitialized upon entrance and exit of the block. Static variables are initialized only the first time and then stay available.
+
+If you have matching variable names (which you shouldn't), then the compiler looks at the one with nearest scope. Ex:
+
+```c
+int x = 0;
+int y = 1;
+
+void foo(void) {
+    double y = 5;
+    printf("The value of y is %d, y); /* Prints 5, not 1. */
+}
+```
+
+# 4.9: Initialization
+Before initializing, external and static variables have a value of 0, and automatic and register variables hold garbage.
+
+Because external and static variables are somewhat independent of context, their initializations must be constant expressions (e.g. they don't depend on other variables, only take literal values like numbers and characters).
+
+Automatic and register variables can be initialized using other variables.
+
+If you explicitly define an array, you don't have to declare its length:
+
+```c
+/* Length of days is inferred to be 12 */
+int days[] = {31, 28. 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+```
+
+If you give fewer initializer values than the size you specified, the missing elements will be 0. You're not allowed to have more initializers than specified size. You can't repeat elements and leave elements in the middle blank.
+
+Character arrays are special, because instead of an array of single characters, you can just give it a string. The following two declarations are equivalent:
+
+```c
+char pattern[] = "ould";
+char pattern[] = { 'o', 'u', 'l', 'd', '\0' };
+```
+
+# 4.10: Recursion
+Functions may call themselves repeatedly. Each invocation gets a fresh set of all the automatic variables.
+
+Recursion isn't any better in terms of memory than iterative solutions since you have to keep a new stack frame for every recursive call, and it's not faster. Recursion is all about convenience and readabiilty.
+
+# 4.11: The C Preprocessor
+Recall that the first step in a compiled language is, well, compilation. A preprocessor goes through and ..."understands" the code to put it together with other libraries and stuff, you get the gist of it. For more detail take a Computer Architecture class.
+
+The two most frequently used preprocessor commands are:
+    - `#include`: Includes the contents of another file during compilation (usually header files)
+    - `#define`: Replaces a "variable" (not really a variable) with a predefined expression. Kind of like a hardcoded variable--the preprocessor basically finds wherever you used the name and replaces it with the hardcoded value.
+
+## 4.11.1: File Inclusion
+Any line in a source file that looks like `#include "filename"` or `#include <filename>` is replaced with the entire contents of the specified file.
+
+If the filename is in quotes, then the system looks near the file you're already in. If there are no quotes or the filename is in `<>`, then the OS takes care of it (they're really vague here).
+
+Most C source files have a bunch of `#include` directives from common libraries and header files, and a bunch of `#define` directives for common values within the code.
+
+When an included file is changed, all files that depend on that must also be recompiled.
+
+## 4.11.2: Macro Substituion
+Looks like `#define name replacement`
+
+All subsequent occurrances of `name` will be replaced with `replacement`. It's like hardcoding without actually hardcoding! The scope of these is file-wide.
+
+You can redefine...anything:
+```c
+#define forever for (;;) /* Infinite loop */
+
+#define max(A, B) ((A) > (B) ? (A) : (B))
+
+#define if else /* please don't do this :( */
+```
+
+Macros come with pitfalls. For example, the replacement for
+```c
+x = max(p + q, r + s);
+```
+would be
+```c
+x = ((p + q) > (r + s) ? (p + q) : (r + s));
+```
+
+That is fine, but what if you had this:
+```c
+x = max(i++, j++);
+```
+
+The increment would happen twice, because you would *really* have this code:
+```c
+x = ((i = i + 1) < (j = j + 1) ? (i = i + 1) : (j = j + 1)) /* i and j are both 2 greater instead of 1 greater */
+```
+
+Still, for "safe" functions like `getchar()` (which I think is really a wrapper around `getc(stdin)`) and `putchar(c)`, you're ok using macros. In fact, most functions in `<ctype.h>` are implemented as macros.
+
+You can undefine names with #undef. This is usually done to ensure that a routine is actually a function and not a macro:
+
+```c
+#undef getchar
+
+int getchar(void) {}
+```
+
+There's a lot of extra stuff in here that I don't think we need. If you care, feel free to read.
+
+## 4.11.3: Conditional Inclusion
+You can control preprocessing itself with conditional statements. This is usually a way to ensure code doesn't compile twice (same header file everywhere).
+
+You can do this:
+```c
+#if !defined(HDR)
+#define HDR
+
+/* Put the contents of hdr.h here */
+
+#endif
+```
+
+The first line is usually shortened to `#ifndef HDR`.
+
+You can also use these to figure out what system you're on to decide which version of a header to include:
+
+```c
+#if SYSTEM == SYSV
+    #define HDR "sysv.h"
+#elif SYSTEM == BSD
+    #define HDR "bsd.h"
+...
+#else
+    #define HDR "default.h"
+#endif
+#include HDR
+
