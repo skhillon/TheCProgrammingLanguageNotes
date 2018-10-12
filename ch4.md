@@ -1,6 +1,5 @@
 # CHAPTER 4: FUNCTIONS AND PROGRAM STRUCTURE
-Use functions cuz they're gr9 and you can trust that it does what it does without worrying about how hashtag modularity.
-
+Use functions.
 You don't need to declare the types of arguments when a function is defined, but you really should.
 
 # 4.1: Basics of Functions
